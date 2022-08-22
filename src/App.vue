@@ -1,32 +1,44 @@
 <template>
-  <div id="app">
-    <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav>
-    <router-view/>
-  </div>
+  <v-app>
+    <v-app-bar
+      app
+      color="#fff"
+      elevation="0"
+    >
+      <div class="d-flex align-center">
+        <v-img
+          alt="Vuetify Logo"
+          class="shrink mx-4"
+          contain
+          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
+          transition="scale-transition"
+          width="40"
+        />
+      <h1>Company</h1>
+      </div>
+
+      <v-spacer></v-spacer>
+
+      <v-btn
+      class="my-8 light-blue lighten-4"  href="https://github.com/paulpessoa/pharma-list" target="_blank" icon x-large>
+        <v-icon medium>mdi-account</v-icon>
+      </v-btn>
+    </v-app-bar>
+
+    <v-main color="#f0f0f0">
+      <router-view/>
+    </v-main>
+  </v-app>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script lang="ts">
+import Vue from 'vue';
 
-nav {
-  padding: 30px;
+export default Vue.extend({
+  name: 'App',
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
-</style>
+  data: () => ({
+    //
+  }),
+});
+</script>
