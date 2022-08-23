@@ -11,45 +11,40 @@
       </v-card-text>
 
       <v-text-field type="search" outlined label="Searching..." placeholder="Type something..." single-line
-        class="mb-4 px-4 pb-4" hide-details dense append-icon="mdi-account-search" @click:append="show4">
+        class="mb-4 px-4 pb-4" hide-details dense append-icon="mdi-account-search" @click:append="loadPatients()">
       </v-text-field>
     </v-card>
     <v-card class="pa-4">
       <h1>{{ msg }}</h1>
-      <v-data-table :headers="headers" :items="patients" sort-by="gender" class="elevation-1">
+      <v-data-table :headers="headers" :items="patients" hide-default-footer :items-per-page="linesTable"
+ sort-by="name" :loading="isLoading" class="elevation-1">
+        <!--Dialogo visualizar pacientes-->
         <template v-slot:top>
-          <!--Dialogo visualizar pacientes-->
-          <v-dialog v-model="dialog" max-width="400px">
+          <v-dialog v-model="dialogDetail" max-width="400px">
             <v-card>
-              <div class="py-4 mb-2">
-                <v-img style="border-radius: 150px" class="mx-auto"
-                  src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg" height="100px" width="100px"></v-img>
-              </div>
+             <div class="py-4 mb-2">
+                <v-img style="border-radius: 150px" class="mx-auto" alt="Imagem" height="100px" width="100px" :src="patients[0].picture.medium"></v-img>
 
+              </div>
               <v-card-text>
-                <!-- informações pacientes visualizando -->
                 <v-row>
-                  <v-text-field v-model="patientList.name" label="Nome completo" outlined dense hide-details
+                  <v-text-field v-model="patients[0].name.first" label="Name" outlined dense hide-details class="mb-2">
+                  </v-text-field>
+                  <v-text-field v-model="patients[0].email" label="Email" outlined dense hide-details class="mb-2">
+                  </v-text-field>
+                  <v-text-field v-model="patients[0].gender" label="Gender" outlined dense hide-details class="mb-2">
+                  </v-text-field>
+                  <v-text-field v-model="patients[0].dob.date" label="Birth" outlined dense hide-details class="mb-2">
+                  </v-text-field>
+                  <v-text-field v-model="patients[0].phone" label="Phone" outlined dense hide-details class="mb-2">
+                  </v-text-field>
+                  <v-text-field v-model="patients[0].location.country" label="Nationality" outlined dense hide-details
                     class="mb-2">
                   </v-text-field>
-                  <v-text-field v-model="patientList.gender" label="Email" outlined dense hide-details class="mb-2">
-                  </v-text-field>
-                  <v-text-field v-model="patientList.gender" label="Gender" outlined dense hide-details class="mb-2">
-                  </v-text-field>
-                  <v-text-field v-model="patientList.birth" label="Birth" outlined dense hide-details class="mb-2">
-                  </v-text-field>
-                  <v-text-field v-model="patientList.birth" label="Telefone" outlined dense hide-details class="mb-2">
-                  </v-text-field>
-                  <v-text-field v-model="patientList.birth" label="Nacionalidade" outlined dense hide-details
+                  <v-text-field v-model="patients[0].location.street.name" label="Location" outlined dense hide-details
                     class="mb-2">
                   </v-text-field>
-                  <v-text-field v-model="patientList.birth" label="Endereço" outlined dense hide-details class="mb-2">
-                  </v-text-field>
-                  <v-text-field v-model="patientList.birth" label="ID (Número de identificação)" outlined dense
-                    hide-details class="mb-2">
-                  </v-text-field>
-                  <v-text-field v-model="patientList.birth" label="URL para compartilhamento" outlined dense
-                    hide-details class="mb-2">
+                  <v-text-field v-model="patients[0].id.value" label="ID" outlined dense hide-details class="mb-2">
                   </v-text-field>
                 </v-row>
               </v-card-text>
@@ -63,12 +58,34 @@
                   <v-icon small class="mr-2">mdi-share-variant</v-icon>
                   Share
                 </v-btn>
-
               </v-card-actions>
             </v-card>
           </v-dialog>
         </template>
 
+        <!--Name Column-->
+        <template v-slot:[`item.name`]="{ item }">
+          <span class="justify-center">
+            {{ item.name.first }}
+            {{ item.name.last }}
+          </span>
+        </template>
+
+        <!--Gender Column -->
+        <template v-slot:[`item.gender`]="{ item }">
+          <span class="justify-center">
+            {{ item.gender[0].toUpperCase() + item.gender.substring(1) }}
+          </span>
+        </template>
+
+        <!--Birth Column -->
+        <template v-slot:[`item.birth`]="{ item }">
+          <span class="justify-center">
+            {{ new Date(item.dob.date).toLocaleDateString() }}
+          </span>
+        </template>
+
+        <!--Botão para visualizar modal -->
         <template v-slot:[`item.actions`]="{ item }">
           <v-btn @click="viewItem(item)" class="primary">
             <v-icon small class="mr-2">
@@ -77,51 +94,70 @@
           </v-btn>
         </template>
       </v-data-table>
+      <v-card-actions>
+        <v-btn :loading="isLoading" class="primary mx-auto px-4" @click="loadPatients()"><v-icon small class="mr-2">mdi-layers-plus</v-icon>Load more</v-btn>
+      </v-card-actions>
     </v-card>
-    {{ patients }}
   </v-container>
 
 </template>
 
 <script>
+const URL_PATIENTS = 'https://randomuser.me/api/?results='
 import axios from 'axios'
 export default {
   name: 'patientTable',
   props: ['msg'],
   data: () => ({
-    show4: true,
-    dialog: false,
+    linesTable: 1,
+    link: null,
+    searhPatients: true,
+    isLoading: false,
     headers: [
-      { text: 'Name', align: 'left', value: 'name' },
+      { text: 'Name', value: 'name', align: 'left' },
       { text: 'Gender', value: 'gender', align: 'center' },
       { text: 'Birth', value: 'birth', align: 'center' },
       { text: 'Actions', value: 'actions', align: 'center', sortable: false },
     ],
-    patients: [],
-    listedIndex: -1,
-    patientList: {
-      name: '',
-      gender: 0,
-      birth: 0,
-    },
-    patientDefault: {
-      name: '',
-      gender: 0,
-      birth: 0,
-    },
+    patients: [{
+      name: {
+        first: null,
+        last: null,
+        title: null
+      },
+      email: null,
+      phone: null,
+      gender: null,
+      dob: {
+        date: null,
+      },
+      picture: {
+        medium: null,
+      },
+      location: {
+        country: null,
+        street: {
+          name: null,
+          number: null,
+        }
+      }
+    }],
+    detailsedit: {},
+    dialogDetail: false
   }),
-  watch: {
-    dialog(val) {
-      val || this.close()
-    }
-  },
+  // watch: {
+  //   dialog(val) {
+  //     val || this.close()
+  //   }
+  // },
   methods: {
     listPatients() {
+      this.isLoading = true
       axios
-        .get('https://randomuser.me/api/?results=1', {})
+        .get(URL_PATIENTS + this.linesTable, {})
         .then((response) => {
           console.log(response.data.results)
-          // this.patients = response.data
+          this.patients = response.data.results
         })
         .catch((error) => {
           console.log(error)
@@ -130,70 +166,17 @@ export default {
     },
     initialize() {
       this.listPatients()
-      this.patients = [
-        {
-          name: 'Frozen Yogurt',
-          gender: 159,
-          birth: 6.0,
-        },
-        {
-          name: 'Ice cream sandwich',
-          gender: 237,
-          birth: 9.0,
-        },
-        {
-          name: 'Eclair',
-          gender: 262,
-          birth: 16.0,
-        },
-        {
-          name: 'Cupcake',
-          gender: 305,
-          birth: 3.7,
-        },
-        {
-          name: 'Gingerbread',
-          gender: 356,
-          birth: 16.0,
-        },
-        {
-          name: 'Jelly bean',
-          gender: 375,
-          birth: 0.0,
-        },
-        {
-          name: 'Lollipop',
-          gender: 392,
-          birth: 0.2,
-        },
-        {
-          name: 'Honeycomb',
-          gender: 408,
-          birth: 3.2,
-        },
-        {
-          name: 'Donut',
-          gender: 452,
-          birth: 25.0,
-        },
-        {
-          name: 'KitKat',
-          gender: 518,
-          birth: 26.0,
-        },
-      ]
     },
     viewItem(item) {
-      this.listedIndex = this.patients.indexOf(item)
-      this.patientList = Object.assign({}, item)
-      this.dialog = true
+      this.detailsedit = item
+      this.dialogDetail = true
     },
     close() {
-      this.dialog = false
-      this.$nextTick(() => {
-        this.patientList = Object.assign({}, this.patientDefault)
-        this.listedIndex = -1
-      })
+      this.dialogDetail = false
+    },
+    loadPatients() {
+      this.linesTable += 5
+      this.listPatients()
     }
   },
   created() {
