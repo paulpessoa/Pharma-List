@@ -27,12 +27,12 @@
                   :src="detailsedit.imageMedium"></v-img>
               </div>
               <v-card-text>
-                <v-text-field v-model="detailsedit.fullName" label="Name" outlined dense hide-details class="mb-2" />
-                <v-text-field v-model="detailsedit.email" label="Email" outlined dense hide-details class="mb-2" />
-                <v-text-field v-model="detailsedit.gender" label="Gender" outlined dense hide-details class="mb-2" />
-                <v-text-field v-model="detailsedit.birth" label="Birth" outlined dense hide-details class="mb-2" />
-                <v-text-field v-model="detailsedit.phone" label="Phone" outlined dense hide-details class="mb-2" />
-                <v-text-field v-model="detailsedit.country" label="Nationality" outlined dense hide-details
+                <v-text-field v-model="detailsedit.fullName" readonly label="Name" outlined dense hide-details class="mb-2" />
+                <v-text-field v-model="detailsedit.email" readonly label="Email" outlined dense hide-details class="mb-2" />
+                <v-text-field v-model="detailsedit.gender" readonly label="Gender" outlined dense hide-details class="mb-2" />
+                <v-text-field v-model="detailsedit.birth" readonly label="Birth" outlined dense hide-details class="mb-2" />
+                <v-text-field v-model="detailsedit.phone" readonly label="Phone" outlined dense hide-details class="mb-2" />
+                <v-text-field v-model="detailsedit.country" readonly label="Nationality" outlined dense hide-details
                   class="mb-2" />
                 <v-text-field v-model="detailsedit.fullAddress" label="Location" outlined dense hide-details
                   class="mb-2" />
