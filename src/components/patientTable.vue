@@ -44,8 +44,8 @@
                 </v-btn>
                 <v-spacer></v-spacer>
                 <v-btn color="primary">
-                  <v-icon small class="mr-2">mdi-share-variant</v-icon>
-                  Share
+                  <v-icon small class="mr-2">mdi-content-copy</v-icon>
+                  share link
                 </v-btn>
               </v-card-actions>
             </v-card>
