@@ -10,14 +10,14 @@
         </div>
       </v-card-text>
         <!-- Patients search -->
-      <v-text-field type="search" outlined label="Searching..." placeholder="Type something..." single-line
-        class="mb-4 px-4 pb-4" hide-details dense append-icon="mdi-account-search" @click:append="loadPatients()">
+      <v-text-field v-model="search" outlined label="Searching..." placeholder="Type something..." single-line
+        class="mb-4 px-4 pb-4" hide-details dense append-icon="mdi-account-search">
       </v-text-field>
     </v-card>
     <v-card class="pa-4">
       <h1>{{ msg }}</h1>
-      <v-data-table :headers="headers" :items="patients" hide-default-footer :items-per-page="linesTable" sort-by="name"
-        :loading="isLoading" class="elevation-1">
+      <v-data-table :headers="headers" :search="search" :items="patients" hide-default-footer :items-per-page="linesTable" sort-by="name"
+        :loading="isLoading" class="elevation-0">
         <!-- Detail patients -->
         <template v-slot:top>
           <v-dialog v-model="dialogDetail" max-width="460px">
@@ -51,29 +51,6 @@
             </v-card>
           </v-dialog>
         </template>
-
-        <!--Name column-->
-        <template v-slot:[`item.name`]="{ item }">
-          <span class="justify-center">
-            {{ item.firstName }}
-            {{ item.lastName }}
-          </span>
-        </template>
-
-        <!--Gender column -->
-        <template v-slot:[`item.gender`]="{ item }">
-          <span class="justify-center">
-            {{ item.gender[0]?.toUpperCase() + item.gender.substring(1) || '' }}
-          </span>
-        </template>
-
-        <!-- Birth column -->
-        <template v-slot:[`item.birth`]="{ item }">
-          <span class="justify-center">
-            {{ item.birth }}
-          </span>
-        </template>
-
         <!-- Details patients button -->
         <template v-slot:[`item.actions`]="{ item }">
           <v-btn @click="viewItem(item)" class="primary">
@@ -84,7 +61,7 @@
         </template>
       </v-data-table>
       <v-card-actions>
-        <v-btn :loading="isLoading" class="primary mx-auto px-4" @click="loadPatients()">
+        <v-btn :loading="isLoading" class="primary mx-auto mt-4 px-4" @click="loadPatients()">
           <v-icon small class="mr-2">mdi-layers-plus</v-icon>Load more
         </v-btn>
       </v-card-actions>
@@ -96,18 +73,19 @@
 const URL_PATIENTS = 'https://randomuser.me/api/?results='
 import axios from 'axios'
 export default {
-  name: 'patientTable',
   props: ['msg'],
+  name: 'patientTable',
   data: () => ({
-    linesTable: 5,
+    search: '',
+    linesTable: 50,
     link: null,
     searhPatients: true,
     isLoading: false,
     headers: [
-      { text: 'Name', value: 'name', align: 'left' },
+      { text: 'Name', value: 'fullName', align: 'left' },
       { text: 'Gender', value: 'gender', align: 'center' },
-      { text: 'Birth', value: 'birth', align: 'center' },
-      { text: 'Actions', value: 'actions', align: 'center', sortable: false },
+      { text: 'Birth', value: 'birth', align: 'center', filterable: false, sortable: false },
+      { text: 'Actions', value: 'actions', align: 'center', filterable: false, sortable: false },
     ],
     patients: [],
     detailsedit: {},
@@ -153,7 +131,7 @@ export default {
       this.dialogDetail = false
     },
     loadPatients() {
-      this.linesTable += 5
+      this.linesTable += 50
       this.listPatients()
     }
   },
