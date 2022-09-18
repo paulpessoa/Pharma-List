@@ -62,7 +62,7 @@
                       class="mb-2" />
                   </v-col>
                 </v-row>
-                <div class="person__map">
+                <div class="person__map" v-if="false">
                   <iframe class="rounded" width="100%" height="150" frameborder="0" borde scrolling="no"
                     marginheight="0" marginwidth="0"
                     :src="'https://maps.google.com/maps?q=' + detailsedit.latitude + ',' + detailsedit.longitude + '&z=7&amp;output=embed'">
